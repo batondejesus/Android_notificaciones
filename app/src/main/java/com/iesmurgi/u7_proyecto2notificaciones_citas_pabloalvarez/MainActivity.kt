@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.iesmurgi.u7_proyecto2notificaciones_citas_pabloalvarez.databinding.ActivityMainBinding
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -54,12 +55,15 @@ class MainActivity : AppCompatActivity() {
         val calendar = Calendar.getInstance()
         val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
         val currentMinute = calendar.get(Calendar.MINUTE)
-        calendar[Calendar.YEAR] = 2022 //Año en el que quieres que el TimePickerDialog aparezca
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+        val currentMonth = calendar.get(Calendar.MONTH)
+        val currentYear = calendar.get(Calendar.YEAR)
 
-        calendar[Calendar.MONTH] = 3 //Mes en el que quieres que el TimePickerDialog aparezca
+        calendar[Calendar.YEAR] = currentYear
 
-        calendar[Calendar.DAY_OF_MONTH] =
-            20 //Día en el que quieres que el TimePickerDialog aparezca
+        calendar[Calendar.MONTH] = currentMonth
+
+        calendar[Calendar.DAY_OF_MONTH] = currentDay
 
         val timePickerDialog = TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
             val selectedTime = Calendar.getInstance()
@@ -67,14 +71,57 @@ class MainActivity : AppCompatActivity() {
             selectedTime.set(Calendar.MINUTE, minute)
 
             if (selectedTime.before(calendar)) {
-                //Muestra un mensaje de error o deshabilita el botón de confirmación
+
                 Toast.makeText(this, "No puedes seleccionar una hora anterior a la actual", Toast.LENGTH_SHORT).show()
             } else {
-                //Ejecuta el código para manejar la selección de tiempo
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val selectedTimeString = timeFormat.format(selectedTime.time)
+                bind.tvHora.text = selectedTimeString
             }
         }, currentHour, currentMinute, false)
 
         timePickerDialog.show()
+    }
+
+    fun establecerCita(View: View) {
+        val calendario = Calendar.getInstance()
+        calendario.add(Calendar.WEEK_OF_YEAR, 2)
+        val anio = calendario.get(Calendar.YEAR)
+        val mes = calendario.get(Calendar.MONTH)
+        val dia = calendario.get(Calendar.DAY_OF_MONTH)
+        val minimo = calendario.timeInMillis
+
+        val dialogoSeleccionarFecha = DatePickerDialog(this,
+            DatePickerDialog.OnDateSetListener { _, anio, mes, dia ->
+                val fechaSeleccionada = Calendar.getInstance()
+                fechaSeleccionada.set(anio, mes, dia)
+                val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val fechaSeleccionadaString = formatoFecha.format(fechaSeleccionada.time)
+                bind.tvCita.text = fechaSeleccionadaString
+            }, anio, mes, dia
+        )
+        dialogoSeleccionarFecha.datePicker.minDate = minimo
+
+        dialogoSeleccionarFecha.show()
+    }
+
+    fun establecerNacimiento(View: View) {
+        val calendario = Calendar.getInstance()
+        val anio = calendario.get(Calendar.YEAR)
+        val mes = calendario.get(Calendar.MONTH)
+        val dia = calendario.get(Calendar.DAY_OF_MONTH)
+
+        val dialogoSeleccionarFecha = DatePickerDialog(this,
+            DatePickerDialog.OnDateSetListener { _, anio, mes, dia ->
+                val fechaSeleccionada = Calendar.getInstance()
+                fechaSeleccionada.set(anio, mes, dia)
+                val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val fechaSeleccionadaString = formatoFecha.format(fechaSeleccionada.time)
+                bind.tvNacimiento.text = fechaSeleccionadaString
+            }, anio, mes, dia
+        )
+
+        dialogoSeleccionarFecha.show()
     }
 }
 
